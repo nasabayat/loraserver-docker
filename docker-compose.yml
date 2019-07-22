@@ -1,6 +1,5 @@
 version: "3"
 
-
 services:
   loraserver:
     image: mxcdocker/loraserver:0.1
@@ -40,7 +39,8 @@ services:
       - TEST_MQTT_SERVER=tcp://mosquitto:1883
     tty: true
     networks:
-      - mxprotocol-server_2appserve
+      - default
+      - mxprotocol-server_2appserver
 
   gatewaybridge:
     image: loraserver/lora-gateway-bridge:3
@@ -79,3 +79,7 @@ services:
 volumes:
   postgresqldata:
   redisdata:
+
+networks:
+  mxprotocol-server_2appserver:
+    external: true
