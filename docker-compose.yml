@@ -2,16 +2,42 @@ version: "3"
 
 services:
   loraserver:
-    image: loraserver/loraserver:3
+    image: mxcdocker/loraserver:0.1
     volumes:
       - ./configuration/loraserver:/etc/loraserver
+      - ./loraserver:/loraserver
+    depends_on:
+      - postgresql
+      - redis
+      - mosquitto
+    environment:
+      - DB_AUTOMIGRATE=true
+      - NET_ID=010203
+      - BAND=EU_863_870
+      - REDIS_URL=redis://redis:6379
+      - GW_MQTT_SERVER=tcp://mosquitto:1883
+      - GW_SERVER_JWT_SECRET=verysecret
+      - POSTGRES_DSN=postgres://loraserver:loraserver@postgres/loraserver?sslmode=disable
+      - TEST_POSTGRES_DSN=postgres://loraserver:loraserver@postgres/loraserver?sslmode=disable
+      - TEST_REDIS_URL=redis://redis:6379
+      - TEST_MQTT_SERVER=tcp://mosquitto:1883
 
   appserver:
-    image: loraserver/lora-app-server:3
+    image: mxcdocker/lora-appserver:0.1
     ports:
       - 8080:8080
     volumes:
       - ./configuration/lora-app-server:/etc/lora-app-server
+      - ./appserver:/lora-app-server
+    depends_on:
+      - postgresql
+      - redis
+      - mosquitto
+    environment:
+      - TEST_POSTGRES_DSN=postgres://loraserver_as:loraserver_as@postgres/loraserver_as?sslmode=disable
+      - TEST_REDIS_URL=redis://redis:6379
+      - TEST_MQTT_SERVER=tcp://mosquitto:1883
+    tty: true
 
   gatewaybridge:
     image: loraserver/lora-gateway-bridge:3
@@ -30,6 +56,12 @@ services:
     volumes:
       - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
       - postgresqldata:/var/lib/postgresql/data
+    #  - ./appserver/.docker-compose/postgresql/initdb:/docker-entrypoint-initdb.d
+    # Added from docker-compose.yml of mxc-loraserver
+    environment:  
+      - POSTGRES_PASSWORD=loraserver
+      - POSTGRES_USER=loraserver
+      - POSTGRES_DB=loraserver
 
   redis:
     image: redis:5-alpine
