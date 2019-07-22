@@ -38,6 +38,8 @@ services:
       - TEST_REDIS_URL=redis://redis:6379
       - TEST_MQTT_SERVER=tcp://mosquitto:1883
     tty: true
+    networks:
+      - mxprotocol-server_2appserve
 
   gatewaybridge:
     image: loraserver/lora-gateway-bridge:3
