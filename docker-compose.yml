@@ -7,8 +7,8 @@ services:
       - ./configuration/loraserver:/etc/loraserver
 
   appserver:
-          # image: mxcdocker/lora-app-server:0.6
-    image: loraserver/lora-app-server:3      
+    image: mxcdocker/lora-app-server:0.6
+          #image: loraserver/lora-app-server:3      
     ports:
       - 8080:8080
         #    volumes:
